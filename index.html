@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To Do App</title>
+</head>
+<script>
+    function parsedResponse3(data){
+        getdata();
+    }
+    function callback3(resp){
+        resp.json().then(parsedResponse3);
+    }
+    function deletetodo(id){
+        fetch("http://localhost:3000/todos/"+id,{
+            method:"DELETE",
+            headers:{
+                "Content-Type":"application/json"
+            }
+        }).then(callback3)
+    }
+    function parsedResponse2(data){
+         console.log(data);
+         var parentElement=document.getElementById("data");
+         parentElement.innerHTML=""
+        //  parentElement.innerHTML=JSON.stringify(data);
+        for(var i=0;i<data.length;i++){
+            var childElement=document.createElement("div");
+            childElement.className="childElement"+data[i].id;
+
+            var grandElement=document.createElement("span");
+            grandElement.innerHTML=data[i].title+" ";
+            var grandElement2=document.createElement("span");
+            grandElement2.innerHTML=data[i].description+" ";
+            var grandElement3=document.createElement("button");
+            grandElement3.innerHTML="Delete";
+            grandElement3.setAttribute("onclick","deletetodo("+data[i].id+")");
+            
+            childElement.appendChild(grandElement)
+            childElement.appendChild(grandElement2)
+            childElement.appendChild(grandElement3)
+            
+            parentElement.appendChild(childElement);
+        }
+    }
+
+    function callback2(resp){
+        resp.json().then(parsedResponse2);
+    }
+
+    function getdata(){
+        fetch("http://localhost:3000/todos",{
+            method:"GET"
+        }).then(callback2)
+    }
+    getdata()
+    function parsedResponse(data){
+        getdata();
+    }
+    function callback(resp){
+        resp.json().then(parsedResponse);
+    }
+    // getdata();
+    function onPress(){
+        var title=document.getElementById("Title").value;
+        var description=document.getElementById("Description").value;
+        document.getElementById("Title").value="";
+        document.getElementById("Description").value="";
+        if(title==""||description==""){
+            alert("Enter Something!!");
+        }
+        else{
+            console.log(title);
+            fetch("http://localhost:3000/todos",{
+                method:"POST",
+                body:JSON.stringify({
+                    title: title,
+                    description: description
+                }),
+                headers:{
+                    "Content-Type":"application/json"
+                }
+            }).then(callback);
+        }
+    }
+</script>
+<body>
+    Title   
+    <input type="text" id="Title"/><br><br>
+    To Do Description
+    <input type="text" id="Description"/><br><br>
+    <button onclick="onPress()">Send ToDo</button>
+    <div id="data"></div>
+</body>
+</html>
