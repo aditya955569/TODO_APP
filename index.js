@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const express=require("express");
 const app =express();
 const port=3000;
@@ -5,53 +6,43 @@ const bodyParser=require("body-parser");
 const cors=require("cors");
 app.use(bodyParser.json());
 app.use(cors());
-//post,put,get,delete
-let todo=[];
+mongoose.set("strictQuery", false);
 
-const findInd = (id)=>{
-    for(var i=0;i<todo.length;i++){
-        if(todo[i].id==id){
-            return i;
-        }
-    }
-    return -1;
-}
+const mongoDB = "mongodb+srv://adityakandpal2016:Tckandpal123@cluster0.hidiazt.mongodb.net/";
+mongoose.connect(mongoDB);
 
-const deleteInd=(ind)=>{
-    let todo2=[];
-    for(var i=0;i<todo.length;i++){
-        if(i!=ind){
-            todo2.push(todo[i]);
-        }
-    }
-    return todo2;
-}
-//post a new todo
+const taskSchema = new mongoose.Schema({
+    id: {type: Number},
+    title: { type: String, required: true },
+    description: { type: String, required: true },
+  });
+  const Task = mongoose.model('Task', taskSchema);
+
+
 app.post('/todos',(req,res)=>{
-    const newTodo={
-        id:Math.floor(Math.random()*100),
-        title:req.body.title,
-        description:req.body.description
-    };
-    todo.push(newTodo);
-    res.json(newTodo);
+  const { title,description } = req.body;
+  const id=Math.floor(Math.random()*100)
+  const obj = { id:id,title: title, description: description };
+  const newTask = new Task(obj);
+  newTask.save();
+  res.json(newTask);
 })
-//delete a todo
-app.delete('/todos/:id',(req,res)=>{
-    var id=parseInt(req.params.id);
-    var ind=findInd(id);
-    console.log(ind);
-    if(ind==-1){
-        res.send("Invalid Response!");
-    }
-    else{
-        todo=deleteInd(ind);
-        res.json(todo);
-    }
+
+app.delete('/todos/:id',async(req,res)=>{
+  var id=parseInt(req.params.id);
+      Task.deleteOne({id:id}).then((result)=>{
+        console.log(result);
+      })
+      const todo=await Task.find({});
+      res.json(todo)
 })
-//print the todos
-app.get('/todos',(req,res)=>{
-    res.json(todo);
+
+app.get('/todos',async(req,res)=>{
+  const todo=await Task.find({});
+  res.json(todo)
 })
+
 
 app.listen(port);
+
+  
