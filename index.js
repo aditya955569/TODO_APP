@@ -8,7 +8,7 @@ app.use(bodyParser.json());
 app.use(cors());
 mongoose.set("strictQuery", false);
 
-const mongoDB = "mongodb+srv://adityakandpal2016:Tckandpal123@cluster0.hidiazt.mongodb.net/";
+const mongoDB = "mongodb+srv://adityakandpal2016:123456@cluster0.hidiazt.mongodb.net/";
 mongoose.connect(mongoDB);
 
 const taskSchema = new mongoose.Schema({
